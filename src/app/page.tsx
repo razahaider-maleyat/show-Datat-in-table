@@ -1,7 +1,6 @@
 "use client"
 import Posts from "../pages/Posts"
 import { useEffect, useState } from "react";
-
 const PRODUCT_API_URI = "https://fakestoreapi.com/products/";
 
 export type PostData = {
