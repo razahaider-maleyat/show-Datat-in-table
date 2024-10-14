@@ -12,6 +12,7 @@ import Box from "@mui/material/Box";
 import { Typography } from "@mui/material";
 import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 import Grid from "@mui/material/Grid2";
+import Image from "next/image";
 
 type PostsTableProps = {
   postsData: PostData[];
@@ -30,7 +31,7 @@ const modalStyle = {
   border: "1px solid #b1a7a7",
 
   ".css-4nmryk-MuiBackdrop-root-MuiModal-backdrop": {
-    backgroundColor: "#fff",
+    backgroundColor: "#fff !important",
   },
 };
 
