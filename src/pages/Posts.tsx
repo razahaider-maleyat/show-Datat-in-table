@@ -7,56 +7,57 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import { PostData } from "@/app/page";
 import Rating from "@mui/material/Rating";
-import Modal from "@mui/material/Modal";
 import Box from "@mui/material/Box";
 import { Typography } from "@mui/material";
-import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 import Grid from "@mui/material/Grid2";
-import Image from "next/image";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import IconButton from "@mui/material/IconButton";
+import CloseIcon from "@mui/icons-material/Close";
+import { styled } from "@mui/material/styles";
 
 type PostsTableProps = {
   postsData: PostData[];
 };
-const modalStyle = {
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  borderRadius: "10px",
-  overflow: "hidden",
-  p: 2,
-  zIndex: 1000,
 
-  display: "flex",
-  flexDirection: "column",
-  border: "1px solid #b1a7a7",
-
-  ".css-4nmryk-MuiBackdrop-root-MuiModal-backdrop": {
-    backgroundColor: "#fff !important",
+const BootstrapDialog = styled(Dialog)(({ theme }) => ({
+  "& .MuiDialogContent-root": {
+    padding: theme.spacing(2),
   },
-};
+  "& .MuiDialogActions-root": {
+    padding: theme.spacing(1),
+  },
+}));
 
 export default function PostsTable({ postsData }: PostsTableProps) {
   const [isModalOpen, setIsModalOpen] = React.useState(false);
   const [currentModalImg, setCurrentModalImg] = React.useState("");
   const [currentImgDec, setCurrentImgDec] = React.useState("");
+  const [currentTitle, setCurrentTitle] = React.useState("");
 
-  const handleOpen = (currentImageURL: string, currentImgDecs: string) => {
+  const handleOpen = (currentImageURL: string, currentImgDecs: string, currentTitle: string) => {
     setIsModalOpen(true);
     setCurrentModalImg(currentImageURL);
     setCurrentImgDec(currentImgDecs);
+    setCurrentTitle(currentTitle);
   };
   const handleClose = () => {
     setIsModalOpen(false);
-    setCurrentModalImg("");
+    setCurrentModalImg("null");
     setCurrentImgDec("");
+    setCurrentTitle("");
   };
 
   return (
     <>
       <TableContainer>
         <Grid container spacing={2}>
-          <Grid size={{ xs: 12, sm: 12, md:12 }}>
-            <Table aria-label="simple table" sx={{border:"1px solid #b1a7a7"}}>
+          <Grid size={{ xs: 12, sm: 12, md: 12 }}>
+            <Table
+              aria-label="simple table"
+              sx={{ border: "1px solid #b1a7a7" }}
+            >
               <TableHead>
                 <TableRow>
                   <TableCell align="right"></TableCell>
@@ -81,12 +82,16 @@ export default function PostsTable({ postsData }: PostsTableProps) {
                       }}
                     >
                       <Box
-                        onClick={() => handleOpen(row.image, row.description)}
+                        onClick={() => handleOpen(row.image, row.description, row.title)} sx={{
+                          width: { xs: 50, sm: 80 },
+                          height: { xs: 50, sm: 80 },
+                        }}
                       >
                         <img
                           src={row.image}
                           loading="lazy"
                           style={{ width: "100%", height: "auto" }}
+                          
                         />
                       </Box>
                     </TableCell>
@@ -108,27 +113,39 @@ export default function PostsTable({ postsData }: PostsTableProps) {
         </Grid>
       </TableContainer>
 
-      <Modal open={isModalOpen} sx={modalStyle}>
-        <>
-          <HighlightOffIcon
-            sx={{ color: "#c62828", ml: "auto", cursor: "pointer" }}
+      <React.Fragment>
+        <BootstrapDialog
+          onClose={handleClose}
+          aria-labelledby="customized-dialog-title"
+          open={isModalOpen}
+        >
+          <DialogTitle sx={{ my:0,mx:2, p: 2, fontSize:15 }} id="customized-dialog-title">
+            {currentTitle}
+          </DialogTitle>
+          <IconButton
+            aria-label="close"
             onClick={handleClose}
-          />
-
-          <img
-            src={currentModalImg}
-            loading="lazy"
-            style={{ width: "150px", height: "150px", margin: "auto" }}
-          />
-
-          <Typography
-            sx={{ mt: 2, overflow: "auto", scrollbarWidth: "none" }}
-            component="p"
+            sx={(theme) => ({
+              position: "absolute",
+              right: 8,
+              top: 8,
+              color: theme.palette.grey[500],
+            })}
           >
-            {currentImgDec}
-          </Typography>
-        </>
-      </Modal>
+            <CloseIcon />
+          </IconButton>
+          <DialogContent dividers>
+            <img
+              src={currentModalImg}
+              loading="lazy"
+              style={{ width: "150px", height: "150px", margin: "auto" }}
+            />
+            <Typography gutterBottom sx={{ mt: 2 }} component="p">
+              {currentImgDec}
+            </Typography>
+          </DialogContent>
+        </BootstrapDialog>
+      </React.Fragment>
     </>
   );
 }
