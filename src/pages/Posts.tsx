@@ -54,7 +54,7 @@ export default function PostsTable({ postsData }: PostsTableProps) {
   };
 
   const handleLoadMore = () => {
-    setVisibleCount((prevCount) => Math.min(prevCount + 5, postsData.length)); // Load 5 more products
+    setVisibleCount((prevCount) => Math.min(prevCount + 5, postsData?.length)); // Load 5 more products
   };
 
   return (
@@ -127,7 +127,7 @@ export default function PostsTable({ postsData }: PostsTableProps) {
             </Table>
           </Grid>
         </Grid>
-        {visibleCount < postsData.length && (
+        {visibleCount < postsData?.length && (
           <Button
             variant="contained"
             onClick={handleLoadMore}
