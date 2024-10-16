@@ -8,7 +8,7 @@ import TableRow from "@mui/material/TableRow";
 import { PostData } from "@/app/page";
 import Rating from "@mui/material/Rating";
 import Box from "@mui/material/Box";
-import { Typography } from "@mui/material";
+import { Button, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
@@ -16,7 +16,7 @@ import DialogContent from "@mui/material/DialogContent";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
 import { styled } from "@mui/material/styles";
-
+import Tooltip from "@mui/material/Tooltip";
 type PostsTableProps = {
   postsData: PostData[];
 };
@@ -31,12 +31,16 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
 }));
 
 export default function PostsTable({ postsData }: PostsTableProps) {
-  const [isModalOpen, setIsModalOpen] = React.useState(false);
-  const [currentModalImg, setCurrentModalImg] = React.useState("");
-  const [currentImgDec, setCurrentImgDec] = React.useState("");
-  const [currentTitle, setCurrentTitle] = React.useState("");
-
-  const handleOpen = (currentImageURL: string, currentImgDecs: string, currentTitle: string) => {
+  const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
+  const [currentModalImg, setCurrentModalImg] = React.useState<string>(" ");
+  const [currentImgDec, setCurrentImgDec] = React.useState<string>("");
+  const [currentTitle, setCurrentTitle] = React.useState<string>("");
+  const [visibleCount, setVisibleCount] = React.useState<number>(5);
+  const handleOpen = (
+    currentImageURL: string,
+    currentImgDecs: string,
+    currentTitle: string
+  ) => {
     setIsModalOpen(true);
     setCurrentModalImg(currentImageURL);
     setCurrentImgDec(currentImgDecs);
@@ -44,9 +48,13 @@ export default function PostsTable({ postsData }: PostsTableProps) {
   };
   const handleClose = () => {
     setIsModalOpen(false);
-    setCurrentModalImg("null");
+    setCurrentModalImg(" ");
     setCurrentImgDec("");
     setCurrentTitle("");
+  };
+
+  const handleLoadMore = () => {
+    setVisibleCount((prevCount) => Math.min(prevCount + 5, postsData.length)); // Load 5 more products
   };
 
   return (
@@ -60,7 +68,8 @@ export default function PostsTable({ postsData }: PostsTableProps) {
             >
               <TableHead>
                 <TableRow>
-                  <TableCell align="right"></TableCell>
+                  <TableCell align="left">Image</TableCell>
+                  <TableCell align="left">Description</TableCell>
                   <TableCell align="left">Title</TableCell>
                   <TableCell align="left">Price</TableCell>
                   <TableCell align="left">Category</TableCell>
@@ -68,7 +77,7 @@ export default function PostsTable({ postsData }: PostsTableProps) {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {postsData?.map((row) => (
+                {postsData?.slice(0, visibleCount).map((row) => (
                   <TableRow
                     key={row.id}
                     sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
@@ -82,23 +91,30 @@ export default function PostsTable({ postsData }: PostsTableProps) {
                       }}
                     >
                       <Box
-                        onClick={() => handleOpen(row.image, row.description, row.title)} sx={{
-                          width: { xs: 50, sm: 80 },
-                          height: { xs: 50, sm: 80 },
+                        onClick={() =>
+                          handleOpen(row.image, row.description, row.title)
+                        }
+                        sx={{
+                          width: { xs: 50, sm: 60 },
+                          height: { xs: 50, sm: 60 },
                         }}
                       >
-                        <img
-                          src={row.image}
-                          loading="lazy"
-                          style={{ width: "100%", height: "auto" }}
-                          
-                        />
+                        <Tooltip title={row.title}>
+                          <img
+                            src={row.image}
+                            loading="lazy"
+                            style={{ width: "100%", height: "auto" }}
+                          />
+                        </Tooltip>
                       </Box>
                     </TableCell>
-                    <TableCell align="right">{row.title}</TableCell>
-                    <TableCell align="right">{row.price}</TableCell>
-                    <TableCell align="right">{row.category}</TableCell>
-                    <TableCell align="right">
+                    <Tooltip title={row.description}>
+                    <TableCell align="left">{row.description}</TableCell>
+                    </Tooltip>
+                    <TableCell align="left">{row.title}</TableCell>
+                    <TableCell align="left">{row.price}</TableCell>
+                    <TableCell align="left">{row.category}</TableCell>
+                    <TableCell align="left">
                       <Rating
                         name="read-only"
                         value={row.rating.rate}
@@ -111,6 +127,15 @@ export default function PostsTable({ postsData }: PostsTableProps) {
             </Table>
           </Grid>
         </Grid>
+        {visibleCount < postsData.length && (
+          <Button
+            variant="contained"
+            onClick={handleLoadMore}
+            sx={{ margin: "16px auto", display: "block" }}
+          >
+            Load More
+          </Button>
+        )}
       </TableContainer>
 
       <React.Fragment>
@@ -119,7 +144,10 @@ export default function PostsTable({ postsData }: PostsTableProps) {
           aria-labelledby="customized-dialog-title"
           open={isModalOpen}
         >
-          <DialogTitle sx={{ my:0,mx:2, p: 2, fontSize:15 }} id="customized-dialog-title">
+          <DialogTitle
+            sx={{ my: 0, mx: 2, p: 2, fontSize: 15 }}
+            id="customized-dialog-title"
+          >
             {currentTitle}
           </DialogTitle>
           <IconButton
